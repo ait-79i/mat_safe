@@ -31,7 +31,7 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('api/user', name: 'user.store', methods: ['POST'])]
+    #[Route('api/user', name: 'user.store', methods: ['POST', 'GET'])]
     public function store(
         Request $request,
         ManagerRegistry $doctrine,
@@ -41,75 +41,170 @@ class UserController extends AbstractController
         EntityManagerInterface $entityManager
     ): Response {
 
-        $em = $doctrine->getManager();
-        $data = json_decode($request->getContent());
+        if ($request->isMethod('GET')) {
+            // Do something for GET requests
+            return
+                $this->json([
+                    'message' => 'this is a get method try POST to add w new user 😊👍'
+                ]);
+        } else {
 
-        $user = new User();
-        $nomComplet = $data->prenom . $data->prenom;
-        $hashedPassword = $passwordHasher->hashPassword(
-            $user,
-            $nomComplet
-        );
+            $em = $doctrine->getManager();
+            $data = json_decode($request->getContent());
 
-        //! retrive compagnies 
+            $user = new User();
+            $nomComplet = $data->prenom . $data->prenom;
+            $hashedPassword = $passwordHasher->hashPassword(
+                $user,
+                $nomComplet
+            );
 
-        $compagnies = $repository->findAll();
+            //! retrive compagnies 
 
-        //! SAFE IN THE USER TABLE 
-        $role = $rolerepository->find($data->role);
+            $compagnies = $repository->findAll();
+            $randomIndex = mt_rand(0, count($compagnies) - 1);
 
-        $user
-            ->setNom($data->nom)
-            ->setPrenom($data->prenom)
-            ->setFonction($data->fonction)
-            ->setEmail($data->email)
-            ->setTelephone($data->telephone)
-            ->setUsername($nomComplet)
-            ->setPassword($hashedPassword)
-            ->setRoles($data->roles)
-            ->setCompagnie($compagnies[mt_rand(1, 5)])
+            //! SAFE IN THE USER TABLE 
+            $role = $rolerepository->find($data->role);
 
-            ->addUserRole($role)
-            ->setLongue($data->longue);
-        $em->persist($user);
+            $user
+                ->setNom($data->nom)
+                ->setPrenom($data->prenom)
+                ->setFonction($data->fonction)
+                ->setEmail($data->email)
+                ->setTelephone($data->telephone)
+                ->setUsername($nomComplet)
+                ->setPassword($hashedPassword)
+                ->setRoles($data->roles)
+                ->setCompagnie($compagnies[$randomIndex])
+                ->addUserRole($role)
+                ->setLongue($data->longue);
+
+            //* store User Adresse 
+
+            $adresse = new Adresse();
+            $adresse
+                ->setDestinataireType($data->destinataireType)
+                ->setAdresse($data->adresse)
+                ->setCodePostal($data->code_postal)
+                ->setVille($data->ville)
+                ->setPays($data->pays);
+            $user->setAdresse($adresse);
+
+            //* invetation info
+
+            $validation = new DateTimeImmutable();
+            $demo = new DateTimeImmutable();
+            $invetation = new Invetation();
+            $invetation->setDateValidation($validation)
+                ->setFinDemo($demo)
+                ->setIsConfirmed($data->confirmation);
+            $user->addInvetation($invetation);
+            $em->persist($user);
 
 
-        //! store IN THE ADRESSE TABLE 
+            //* set roles and permissions
+            $permission = new Permission();
+            $permission->setTitre($data->permission)
+                ->addRole($role);
+            $em->persist($permission);
 
-        $adresse = new Adresse();
-
-        $adresse
-            ->setDestinataireType($data->destinataireType)
-            ->setAdresse($data->adresse)
-            ->setCodePostal($data->code_postal)
-            ->setVille($data->ville)
-            ->setPays($data->pays);
-        $em->persist($adresse);
-
-        //! STORE IN THE INVETATION TABLE 
-        $validation = new DateTimeImmutable();
-        $demo = new DateTimeImmutable();
-        $invetation = new Invetation();
-        $invetation->setDateValidation($validation)
-            ->setFinDemo($demo)
-            ->setIsConfirmed($data->confirmation)
-            ->setUser($user);
-        $em->persist($invetation);
-
-        //! STORE IN THE INVETATION TABLE 
-        //* set roles and permissions
-        $permission = new Permission();
-        $permission->setTitre($data->permission)
-            ->addRole($role);
-        $em->persist($permission);
-
-        $em->flush();
-        return $this->json([
-            'message' => 'Registered Successfully chof database',
-            "roles" => $role,
-            "compagnies" => $compagnies
-        ]);
+            $em->flush();
+            return $this->json([
+                'message' => 'User was Added Successfully  check the database'
+            ]);
+        }
     }
+
+
+    // =========================================================================
+
+    //* UPDATE USER DATA
+
+    #[Route('api/user/edition/{id}', name: 'user.update', methods: ['GET', "POST"])]
+    public function update(
+        Request $request,
+        User $user,
+        AdresseRepository $adresserepo,
+        RoleRepository $rolerepo,
+        EntityManagerInterface $Manager,
+        int $id
+    ): Response {
+        if ($request->isMethod('GET')) {
+
+            $userRolesArray = [];
+            $userPermissionsArray = [];
+            foreach ($user->getRoleId() as $role) {
+                $userRolesArray[] = $role->getTitre();
+
+                foreach ($role->getPermissions() as $permission) {
+                    $userPermissionsArray[] = $permission->getTitre();
+                }
+            }
+            return $this->json([
+                'message' => 'Update route',
+                "user " => [
+                    "nom" => $user->getNom(),
+                    "prenom" => $user->getPrenom(),
+                    "fonction" => $user->getFonction(),
+                    "email" => $user->getEmail(),
+                    "telephone" => $user->getTelephone(),
+                    "destinataireType" => $user->getNom(),
+                    "adresse" => $user->getAdresse()->getAdresse(),
+                    "code_postal" => $user->getAdresse()->getCodePostal(),
+                    "ville" => $user->getAdresse()->getVille(),
+                    "pays" => $user->getAdresse()->getPays(),
+                    "longue" => $user->getLongue(),
+                    "role" => $userRolesArray,
+                    "permissions" => $userPermissionsArray,
+                ]
+            ]);
+        } else {
+
+            $newData = json_decode($request->getContent());
+            $adresseIns = $adresserepo->find($user);
+            // $roleinst = $rolerepo->findOneBy(['id' => $user]);
+            // $adresseIns
+            //     ->setAdresse($newData->adresse)
+            //     ->setCodePostal($newData->code_postal)
+            //     ->setVille($newData->ville)
+            //     ->setPays($newData->pays);
+
+
+            $user->setNom($newData->nom)
+                ->setPrenom($newData->prenom)
+                ->setFonction($newData->fonction)
+                ->setEmail($newData->email)
+                ->setTelephone($newData->telephone)
+                ->setLongue($newData->longue);
+            // ->setAdresse($adresseIns);
+            $Manager->persist($user);
+            $Manager->flush();
+            //     // ->addRoleId($roleinst);
+
+            // // "role" => $userRolesArray,
+            // // "permissions" => $userPermissionsArray,
+
+            return $this->json(["user " => [
+                "nom" => $user->getNom(),
+                "prenom" => $user->getPrenom(),
+                "fonction" => $user->getFonction(),
+                "email" => $user->getEmail(),
+                "telephone" => $user->getTelephone(),
+                "destinataireType" => $user->getNom(),
+                "adresse" => $user->getAdresse()->getAdresse(),
+                "code_postal" => $user->getAdresse()->getCodePostal(),
+                "ville" => $user->getAdresse()->getVille(),
+                "pays" => $user->getAdresse()->getPays(),
+                "longue" => $user->getLongue()
+            ]]);
+        }
+    }
+
+    // =========================================================================
+
+    //* DELETE A USER 
+
 
     #[Route('api/user/delete/{id}', 'user.delete', methods: ['GET'])]
     public function delete(EntityManagerInterface $manager, User $user,): Response
@@ -117,31 +212,5 @@ class UserController extends AbstractController
         $manager->remove($user);
         $manager->flush();
         return $this->json(['message' => 'DELETED SUCCESSFULLY']);
-    }
-
-    //* UPDATE USER DATA
-
-    #[Route('api/user/edition/{id}', name: 'user.update', methods: ['GET', "POST"])]
-    public function update(
-        Request $request,
-        UserPasswordHasherInterface $passwordHasher,
-        CompagnieRepository $repository,
-        User $user,
-    ): Response {
-        return $this->json([
-            'message' => 'Update route',
-            "user " => [
-                "nom" => $user->getNom(),
-                "prenom" => $user->getPrenom(),
-                "fonction" => $user->getNom(),
-                "email" => $user->getEmail(),
-                "telephone" => $user->getTelephone(),
-                "destinataireType" => $user->getNom(),
-                "adresse" => $user->getAdresse()->getCodePostal(),
-                "longue" => $user->getLongue(),
-                "roles" => $user->getUserRoles(),
-                "role" => $user->getRoleId(),
-            ]
-        ]);
     }
 }
