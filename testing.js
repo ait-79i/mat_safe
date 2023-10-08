@@ -18,3 +18,29 @@ var arr = {
 	"confirmation": true,
 	"notification": false,
 };
+
+var tache = {
+	"createur": 7,
+	"titre": "tacheTitre",
+	"complexite": "Simple",
+	"priorite": "Modérée",
+	"description": "this is the description of this task i hope you  like it ?!",
+	"referance": "Mensuel",
+	"mot_cles": "ajouter ****** ",
+	"referanciel": "la dernier tache",
+	"date_debut": "i did it automaticlly",
+	"echeance ": "the same ",
+	"compagnie": 2,
+	"user_id": 2,
+	"role": "Organisateur",
+	"statut": "A réaliser",
+	// "est_recurrente": 0,
+	"est_recurrente": 1,
+	"type": "WEEKLY",
+	"frequence": "2"
+};
+
+
+
+
+

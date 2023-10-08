@@ -59,6 +59,12 @@ class Tache
     #[ORM\JoinColumn(nullable: false)]
     private ?User $creator = null;
 
+    #[ORM\ManyToOne(inversedBy: 'taches')]
+    private ?Compagnie $compagnie = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $echeance = null;
+
     public function __construct()
     {
         $this->user = new ArrayCollection();
@@ -252,6 +258,30 @@ class Tache
     public function setCreator(?User $creator): static
     {
         $this->creator = $creator;
+
+        return $this;
+    }
+
+    public function getCompagnie(): ?Compagnie
+    {
+        return $this->compagnie;
+    }
+
+    public function setCompagnie(?Compagnie $compagnie): static
+    {
+        $this->compagnie = $compagnie;
+
+        return $this;
+    }
+
+    public function getEcheance(): ?\DateTimeInterface
+    {
+        return $this->echeance;
+    }
+
+    public function setEcheance(\DateTimeInterface $echeance): static
+    {
+        $this->echeance = $echeance;
 
         return $this;
     }

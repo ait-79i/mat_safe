@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+
 #[ORM\Entity(repositoryClass: CompagnieRepository::class)]
 class Compagnie
 {
@@ -16,34 +17,46 @@ class Compagnie
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    private ?string $type = null;
+
+    #[ORM\Column(length: 255)]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $type = null;
+    private ?string $site = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $secteur = null;
 
     #[ORM\Column(length: 255)]
     private ?string $siret = null;
 
-    #[ORM\OneToMany(mappedBy: 'compagnie', targetEntity: User::class, cascade: ['persist', 'remove'])]
-    private Collection $user;
-
-    #[ORM\OneToMany(mappedBy: 'compagnie', targetEntity: Adresse::class, cascade: ['persist', 'remove'])]
-    private Collection $adresses;
-
-    #[ORM\OneToMany(mappedBy: 'compagnie', targetEntity: SousCompagnie::class, cascade: ['persist', 'remove'])]
-    private Collection $sousCompagnies;
+    #[ORM\OneToMany(mappedBy: 'compagnie', targetEntity: Tache::class)]
+    private Collection $taches;
 
     public function __construct()
     {
-        $this->user = new ArrayCollection();
-        $this->adresses = new ArrayCollection();
-        $this->sousCompagnies = new ArrayCollection();
+        $this->taches = new ArrayCollection();
     }
 
     public function getId(): ?int
     {
         return $this->id;
     }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): static
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+
 
     public function getNom(): ?string
     {
@@ -57,14 +70,26 @@ class Compagnie
         return $this;
     }
 
-    public function getType(): ?string
+    public function getSite(): ?string
     {
-        return $this->type;
+        return $this->site;
     }
 
-    public function setType(string $type): static
+    public function setSite(string $site): static
     {
-        $this->type = $type;
+        $this->site = $site;
+
+        return $this;
+    }
+
+    public function getSecteur(): ?string
+    {
+        return $this->secteur;
+    }
+
+    public function setSecteur(string $secteur): static
+    {
+        $this->secteur = $secteur;
 
         return $this;
     }
@@ -82,89 +107,29 @@ class Compagnie
     }
 
     /**
-     * @return Collection<int, User>
+     * @return Collection<int, Tache>
      */
-    public function getUser(): Collection
+    public function getTaches(): Collection
     {
-        return $this->user;
+        return $this->taches;
     }
 
-    public function addUser(User $user): static
+    public function addTach(Tache $tach): static
     {
-        if (!$this->user->contains($user)) {
-            $this->user->add($user);
-            $user->setCompagnie($this);
+        if (!$this->taches->contains($tach)) {
+            $this->taches->add($tach);
+            $tach->setCompagnie($this);
         }
 
         return $this;
     }
 
-    public function removeUser(User $user): static
+    public function removeTach(Tache $tach): static
     {
-        if ($this->user->removeElement($user)) {
+        if ($this->taches->removeElement($tach)) {
             // set the owning side to null (unless already changed)
-            if ($user->getCompagnie() === $this) {
-                $user->setCompagnie(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Adresse>
-     */
-    public function getAdresses(): Collection
-    {
-        return $this->adresses;
-    }
-
-    public function addAdress(Adresse $adress): static
-    {
-        if (!$this->adresses->contains($adress)) {
-            $this->adresses->add($adress);
-            $adress->setCompagnie($this);
-        }
-
-        return $this;
-    }
-
-    public function removeAdress(Adresse $adress): static
-    {
-        if ($this->adresses->removeElement($adress)) {
-            // set the owning side to null (unless already changed)
-            if ($adress->getCompagnie() === $this) {
-                $adress->setCompagnie(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, SousCompagnie>
-     */
-    public function getSousCompagnies(): Collection
-    {
-        return $this->sousCompagnies;
-    }
-
-    public function addSousCompagny(SousCompagnie $sousCompagny): static
-    {
-        if (!$this->sousCompagnies->contains($sousCompagny)) {
-            $this->sousCompagnies->add($sousCompagny);
-            $sousCompagny->setCompagnie($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSousCompagny(SousCompagnie $sousCompagny): static
-    {
-        if ($this->sousCompagnies->removeElement($sousCompagny)) {
-            // set the owning side to null (unless already changed)
-            if ($sousCompagny->getCompagnie() === $this) {
-                $sousCompagny->setCompagnie(null);
+            if ($tach->getCompagnie() === $this) {
+                $tach->setCompagnie(null);
             }
         }
 

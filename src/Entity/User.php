@@ -44,7 +44,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $longue = null;
 
-    #[ORM\ManyToMany(targetEntity: Role::class, mappedBy:'user', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToMany(targetEntity: Role::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
     private Collection $userRoles;
 
     #[ORM\ManyToOne(inversedBy: 'user', cascade: ['persist', 'remove'])]
@@ -54,7 +54,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?Adresse $adresse = null;
 
-    #[ORM\ManyToMany(targetEntity: Tache::class, mappedBy:'user', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToMany(targetEntity: Tache::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
     private Collection $taches;
 
     #[ORM\OneToMany(mappedBy: 'creator', targetEntity: Tache::class, cascade: ['persist', 'remove'])]
@@ -105,7 +105,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @see UserInterface
      */
-    
+
     public function getUserIdentifier(): string
     {
         return (string) $this->email;

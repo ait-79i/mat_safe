@@ -10,34 +10,23 @@ use App\Entity\Permission;
 use App\Repository\AdresseRepository;
 use App\Repository\RoleRepository;
 use App\Repository\CompagnieRepository;
-use App\Repository\InvetationRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-// #[Route("/api", name: "api_")]
 class UserController extends AbstractController
 {
-    #[Route('user', name: 'app_user')]
-    public function index(): JsonResponse
-    {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-        ]);
-    }
-
     #[Route('api/user', name: 'user.store', methods: ['POST', 'GET'])]
     public function store(
         Request $request,
         ManagerRegistry $doctrine,
         UserPasswordHasherInterface $passwordHasher,
         CompagnieRepository  $repository,
-        RoleRepository  $rolerepository,
+        RoleRepository  $roleRepository,
         EntityManagerInterface $entityManager
     ): Response {
 
@@ -65,8 +54,7 @@ class UserController extends AbstractController
             $randomIndex = mt_rand(0, count($compagnies) - 1);
 
             //! SAFE IN THE USER TABLE 
-            $role = $rolerepository->find($data->role);
-
+            $role = $roleRepository->findOneBy(["id" => $data->role]);
             $user
                 ->setNom($data->nom)
                 ->setPrenom($data->prenom)
@@ -121,14 +109,13 @@ class UserController extends AbstractController
 
     //* UPDATE USER DATA
 
-    #[Route('api/user/edition/{id}', name: 'user.update', methods: ['GET', "POST"])]
+    #[Route('api/user/update/{id}', name: 'user.update', methods: ['GET', "PUT"])]
     public function update(
         Request $request,
-        User $user,
         AdresseRepository $adresserepo,
         RoleRepository $rolerepo,
         EntityManagerInterface $Manager,
-        int $id
+        User $user,
     ): Response {
         if ($request->isMethod('GET')) {
 
@@ -163,13 +150,11 @@ class UserController extends AbstractController
 
             $newData = json_decode($request->getContent());
             $adresseIns = $adresserepo->find($user);
-            // $roleinst = $rolerepo->findOneBy(['id' => $user]);
-            // $adresseIns
-            //     ->setAdresse($newData->adresse)
-            //     ->setCodePostal($newData->code_postal)
-            //     ->setVille($newData->ville)
-            //     ->setPays($newData->pays);
-
+            $adresseIns->setAdresse($newData->adresse)
+                ->setPays($newData->pays)
+                ->setCodePostal($newData->code_postal)
+                ->setVille($newData->ville);
+            $Manager->persist($adresseIns);
 
             $user->setNom($newData->nom)
                 ->setPrenom($newData->prenom)
@@ -177,35 +162,17 @@ class UserController extends AbstractController
                 ->setEmail($newData->email)
                 ->setTelephone($newData->telephone)
                 ->setLongue($newData->longue);
-            // ->setAdresse($adresseIns);
+
             $Manager->persist($user);
             $Manager->flush();
-            //     // ->addRoleId($roleinst);
 
-            // // "role" => $userRolesArray,
-            // // "permissions" => $userPermissionsArray,
-
-            return $this->json(["user " => [
-                "nom" => $user->getNom(),
-                "prenom" => $user->getPrenom(),
-                "fonction" => $user->getFonction(),
-                "email" => $user->getEmail(),
-                "telephone" => $user->getTelephone(),
-                "destinataireType" => $user->getNom(),
-                "adresse" => $user->getAdresse()->getAdresse(),
-                "code_postal" => $user->getAdresse()->getCodePostal(),
-                "ville" => $user->getAdresse()->getVille(),
-                "pays" => $user->getAdresse()->getPays(),
-                "longue" => $user->getLongue()
-            ]]);
+            return $this->json(["user " => $user]);
         }
     }
-     //TODO  comment just for test 
 
     // =========================================================================
 
     //* DELETE A USER 
-
 
     #[Route('api/user/delete/{id}', 'user.delete', methods: ['GET'])]
     public function delete(EntityManagerInterface $manager, User $user,): Response

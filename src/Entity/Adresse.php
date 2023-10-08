@@ -31,7 +31,7 @@ class Adresse
     #[ORM\OneToOne(inversedBy: 'adresse', cascade: ['persist', 'remove'])]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(inversedBy: 'adresses')]
+    #[ORM\ManyToOne(inversedBy: 'adresses', cascade: ['persist', 'remove'])]
     private ?Compagnie $compagnie = null;
 
     public function getId(): ?int
