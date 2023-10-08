@@ -98,12 +98,13 @@ class AppFixtures extends Fixture
                 ->setCodePostal($this->faker->postcode())
                 ->setVille($this->faker->city())
                 ->setPays($this->faker->country());
+            mt_rand(0, 1) == 1 ? $adresse->setUser($user) : $adresse->setCompagnie($comp);
 
-            $user->setAdresse($adresse);
             mt_rand(0, 1) == 1 ? $user->addRoleId($randomRole) : null;
 
             $manager->persist($comp);
-            $manager->persist($user);
+            $manager->persist($comp);
+            $manager->persist($adresse);
         }
 
 

@@ -17,6 +17,17 @@ use Symfony\Component\Routing\Annotation\Route;
 class TacheController extends AbstractController
 {
 
+    private $em;
+    private $userRepo;
+    private $compagnieRepo;
+
+    public function __construct(EntityManagerInterface $em, UserRepository $userRepo, CompagnieRepository $compagnieRepo)
+    {
+        $this->em = $em;
+        $this->userRepo = $userRepo;
+        $this->compagnieRepo = $compagnieRepo;
+    }
+
     #[Route('taches', name: 'taches.index')]
     public function index(TacheRepository $rep): JsonResponse
     {
@@ -29,16 +40,16 @@ class TacheController extends AbstractController
     }
 
     #[Route('tache', name: 'tache.store', methods: ["POST"])]
-    public function store(Request $request, EntityManagerInterface $em, UserRepository $userRepo, CompagnieRepository $compagnieRep): JsonResponse
+    public function store(Request $request): JsonResponse
     {
 
         $data = json_decode($request->getContent());
 
-        $createur = $userRepo->findOneBy(['id' => $data->createur]);
+        $createur = $this->userRepo->findOneBy(['id' => $data->createur]);
 
-        $compagnie = $compagnieRep->findOneBy(['id' => $data->compagnie]);
+        $compagnie = $this->compagnieRepo->findOneBy(['id' => $data->compagnie]);
 
-        $userTo = $userRepo->findOneBy(['id' => $data->user_id]);
+        $userTo = $this->userRepo->findOneBy(['id' => $data->user_id]);
 
         $tache = new Tache();
         $tache
@@ -58,7 +69,6 @@ class TacheController extends AbstractController
 
             ->setCompagnie($compagnie)
             ->addUser($userTo);
-
         if ($data->est_recurrente) {
             $periodicite = new Periodicite();
             $periodicite->setType($data->type)
@@ -66,21 +76,64 @@ class TacheController extends AbstractController
 
             $tache->setPeriodicite($periodicite);
         }
-        $em->persist($tache);
-        $em->flush();
+        $this->em->persist($tache);
+        $this->em->flush();
 
-        return $this->json(["message"=>"Added with success"]);
+        return $this->json(["message" => "Added with success"]);
+    }
+
+
+
+    #[Route("tache/update/{id}", name: "tache.update", methods: ["PUT","PATCH"])]
+    public function upgate(Request $request, Tache $tache): JsonResponse
+    {
+        $data = json_decode($request->getContent());
+
+        $createur = $this->userRepo->findOneBy(['id' => $data->createur]);
+
+        $compagnie = $this->compagnieRepo->findOneBy(['id' => $data->compagnie]);
+
+        $userTo = $this->userRepo->findOneBy(['id' => $data->user_id]);
+        $tache
+            ->setCreator($createur)
+            ->setTitre($data->titre)
+            ->setComplexite($data->complexite)
+            ->setPriorite($data->priorite)
+            ->setDescription($data->description)
+            ->setReferance($data->referance)
+            ->setMotCles($data->mot_cles)
+            ->setReferanciel($data->referanciel)
+            ->setDateDebut(new \DateTimeImmutable())
+            ->setEcheance(new \DateTimeImmutable('+1 week'))
+            ->setStatut($data->statut)
+            ->setEstRecurrente($data->est_recurrente)
+            ->setRole($data->role)
+
+            ->setCompagnie($compagnie)
+            ->addUser($userTo);
+        if ($data->est_recurrente) {
+            $periodicite = $tache->getPeriodicite();
+            $periodicite->setType($data->type)
+                ->setFrequence($data->frequence);
+
+            $tache->setPeriodicite($periodicite);
+        }
+        $this->em->persist($tache);
+        $this->em->flush();
+
+
+        return $this->json(["message" => "Updated Seccussfully"]);
     }
 
 
 
 
-    public function upgate(): JsonResponse
+    #[Route("tache/delete/{id}", name: "tache.destroy", methods: ["POST"])]
+    public function delete(Tache $tache): JsonResponse
     {
-        return $this->json([]);
-    }
-    public function delete(): JsonResponse
-    {
-        return $this->json([]);
+
+        $this->em->remove($tache);
+        $this->em->flush();
+        return $this->json(["message" => "Tache :" . $tache->getTitre() . " Deleted Seccussfully"]);
     }
 }

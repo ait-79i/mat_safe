@@ -238,6 +238,9 @@
     <service id="App\Controller\TacheController" class="App\Controller\TacheController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
+      <argument type="service" id="doctrine.orm.default_entity_manager"/>
+      <argument type="service" id="App\Repository\UserRepository"/>
+      <argument type="service" id="App\Repository\CompagnieRepository"/>
       <call method="setContainer">
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\TacheController"/>
       </call>
@@ -308,7 +311,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.uqoGiJB"/>
+      <argument type="service" id=".service_locator.MKEdqc_"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -1471,7 +1474,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.uqoGiJB"/>
+      <argument type="service" id=".service_locator.MKEdqc_"/>
     </service>
     <service id="routing.resolver" class="Symfony\Component\Config\Loader\LoaderResolver">
       <call method="addLoader">
@@ -5142,17 +5145,19 @@
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
-    <service id=".service_locator.6YSh.EL" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator._JdKj9p" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
-        <argument key="compagnie" type="service_closure" id=".errored..service_locator.6YSh.EL.App\Entity\Compagnie"/>
+        <argument key="adresseRepo" type="service_closure" id="App\Repository\AdresseRepository"/>
+        <argument key="compagnie" type="service_closure" id=".errored..service_locator._JdKj9p.App\Entity\Compagnie"/>
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
-    <service id=".service_locator.JcC3SpA" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator..W5wjef" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
-        <argument key="compagnie" type="service_closure" id=".errored..service_locator.JcC3SpA.App\Entity\Compagnie"/>
+        <argument key="adresseRepo" type="service_closure" id="App\Repository\AdresseRepository"/>
+        <argument key="compagnie" type="service_closure" id=".errored..service_locator..W5wjef.App\Entity\Compagnie"/>
         <argument key="manager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
         <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
       </argument>
@@ -5170,12 +5175,10 @@
         <argument key="rep" type="service_closure" id="App\Repository\TacheRepository"/>
       </argument>
     </service>
-    <service id=".service_locator.5PkTFPo" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.GJi4qMg" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
-        <argument key="compagnieRep" type="service_closure" id="App\Repository\CompagnieRepository"/>
-        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
-        <argument key="userRepo" type="service_closure" id="App\Repository\UserRepository"/>
+        <argument key="tache" type="service_closure" id=".errored..service_locator.GJi4qMg.App\Entity\Tache"/>
       </argument>
     </service>
     <service id=".service_locator.PTsd.1b" class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -5204,15 +5207,16 @@
         <argument key="user" type="service_closure" id=".errored..service_locator.xZ4BuEO.App\Entity\User"/>
       </argument>
     </service>
-    <service id=".service_locator.uqoGiJB" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MKEdqc_" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
-        <argument key="App\Controller\CompagnieController::delete" type="service_closure" id=".service_locator.JcC3SpA"/>
+        <argument key="App\Controller\CompagnieController::delete" type="service_closure" id=".service_locator..W5wjef"/>
         <argument key="App\Controller\CompagnieController::store" type="service_closure" id=".service_locator.9kKwU2t"/>
-        <argument key="App\Controller\CompagnieController::update" type="service_closure" id=".service_locator.6YSh.EL"/>
+        <argument key="App\Controller\CompagnieController::update" type="service_closure" id=".service_locator._JdKj9p"/>
         <argument key="App\Controller\RegistrationController::index" type="service_closure" id=".service_locator.dTaHD7m"/>
+        <argument key="App\Controller\TacheController::delete" type="service_closure" id=".service_locator.GJi4qMg"/>
         <argument key="App\Controller\TacheController::index" type="service_closure" id=".service_locator.S9zgqlS"/>
-        <argument key="App\Controller\TacheController::store" type="service_closure" id=".service_locator.5PkTFPo"/>
+        <argument key="App\Controller\TacheController::upgate" type="service_closure" id=".service_locator.GJi4qMg"/>
         <argument key="App\Controller\UserController::delete" type="service_closure" id=".service_locator.xZ4BuEO"/>
         <argument key="App\Controller\UserController::store" type="service_closure" id=".service_locator.PTsd.1b"/>
         <argument key="App\Controller\UserController::update" type="service_closure" id=".service_locator.1fdu00E"/>
@@ -5220,12 +5224,13 @@
         <argument key="App\Kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel::loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
-        <argument key="App\Controller\CompagnieController:delete" type="service_closure" id=".service_locator.JcC3SpA"/>
+        <argument key="App\Controller\CompagnieController:delete" type="service_closure" id=".service_locator..W5wjef"/>
         <argument key="App\Controller\CompagnieController:store" type="service_closure" id=".service_locator.9kKwU2t"/>
-        <argument key="App\Controller\CompagnieController:update" type="service_closure" id=".service_locator.6YSh.EL"/>
+        <argument key="App\Controller\CompagnieController:update" type="service_closure" id=".service_locator._JdKj9p"/>
         <argument key="App\Controller\RegistrationController:index" type="service_closure" id=".service_locator.dTaHD7m"/>
+        <argument key="App\Controller\TacheController:delete" type="service_closure" id=".service_locator.GJi4qMg"/>
         <argument key="App\Controller\TacheController:index" type="service_closure" id=".service_locator.S9zgqlS"/>
-        <argument key="App\Controller\TacheController:store" type="service_closure" id=".service_locator.5PkTFPo"/>
+        <argument key="App\Controller\TacheController:upgate" type="service_closure" id=".service_locator.GJi4qMg"/>
         <argument key="App\Controller\UserController:delete" type="service_closure" id=".service_locator.xZ4BuEO"/>
         <argument key="App\Controller\UserController:store" type="service_closure" id=".service_locator.PTsd.1b"/>
         <argument key="App\Controller\UserController:update" type="service_closure" id=".service_locator.1fdu00E"/>
@@ -5823,11 +5828,14 @@
     <service id=".errored..service_locator.y4_Zrx..Symfony\Component\Config\Loader\LoaderInterface" class="Symfony\Component\Config\Loader\LoaderInterface">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.y4_Zrx.&quot;: it needs an instance of &quot;Symfony\Component\Config\Loader\LoaderInterface&quot; but this type has been excluded from autowiring."/>
     </service>
-    <service id=".errored..service_locator.6YSh.EL.App\Entity\Compagnie" class="App\Entity\Compagnie">
-      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.6YSh.EL&quot;: it needs an instance of &quot;App\Entity\Compagnie&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    <service id=".errored..service_locator._JdKj9p.App\Entity\Compagnie" class="App\Entity\Compagnie">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator._JdKj9p&quot;: it needs an instance of &quot;App\Entity\Compagnie&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
-    <service id=".errored..service_locator.JcC3SpA.App\Entity\Compagnie" class="App\Entity\Compagnie">
-      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.JcC3SpA&quot;: it needs an instance of &quot;App\Entity\Compagnie&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    <service id=".errored..service_locator..W5wjef.App\Entity\Compagnie" class="App\Entity\Compagnie">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator..W5wjef&quot;: it needs an instance of &quot;App\Entity\Compagnie&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
+    <service id=".errored..service_locator.GJi4qMg.App\Entity\Tache" class="App\Entity\Tache">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.GJi4qMg&quot;: it needs an instance of &quot;App\Entity\Tache&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
     <service id=".errored..service_locator.1fdu00E.App\Entity\User" class="App\Entity\User">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.1fdu00E&quot;: it needs an instance of &quot;App\Entity\User&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
@@ -6595,7 +6603,7 @@
     <service id="Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface" alias="lexik_jwt_authentication.encoder.lcobucci"/>
     <service id="lexik_jwt_authentication.key_loader" alias="lexik_jwt_authentication.key_loader.raw" public="true"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.7nzbL4K" public="true"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.uqoGiJB"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.MKEdqc_"/>
     <service id="jms_serializer.authorization_checker" alias="security.authorization_checker" public="true"/>
     <service id="fos_rest.serializer" alias="fos_rest.serializer.jms"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
@@ -6605,12 +6613,11 @@
     <service id=".service_locator.13qzyLC" alias="jms_serializer.metadata.service_locator"/>
     <service id=".service_locator.k3s3K.2" alias=".service_locator.dsdSIIc"/>
     <service id=".service_locator.o.uf2zi" alias=".service_locator.7nzbL4K"/>
-    <service id=".service_locator.0ThzLxy" alias=".service_locator.6YSh.EL"/>
-    <service id=".service_locator.jTRbR80" alias=".service_locator.JcC3SpA"/>
-    <service id=".service_locator.cSLqsh9" alias=".service_locator.5PkTFPo"/>
+    <service id=".service_locator.7dDm9RJ" alias=".service_locator._JdKj9p"/>
+    <service id=".service_locator.Mxu28il" alias=".service_locator..W5wjef"/>
     <service id=".service_locator.IysUUUO" alias=".service_locator.PTsd.1b"/>
     <service id=".service_locator..MXomX6" alias=".service_locator.1fdu00E"/>
-    <service id=".service_locator.SQhgIDp" alias=".service_locator.uqoGiJB"/>
+    <service id=".service_locator.RpaGNxL" alias=".service_locator.MKEdqc_"/>
     <service id=".service_locator.LMuqDDe" alias=".service_locator.VHsrTPK"/>
     <service id=".service_locator.jUv.zyj" alias=".service_locator.O2p6Lk7"/>
     <service id="event_dispatcher" alias="debug.event_dispatcher" public="true"/>
@@ -6635,11 +6642,11 @@
     <service id="jms_serializer.metadata.file_locator" alias="jms_serializer.metadata.traceable_file_locator"/>
     <service id=".service_locator.gFlme_s" alias=".service_locator.y4_Zrx."/>
     <service id=".service_locator.gaTSUXr" alias=".service_locator.9kKwU2t"/>
-    <service id=".service_locator.P4NAgCr" alias=".service_locator.6YSh.EL"/>
-    <service id=".service_locator.ELN2U7X" alias=".service_locator.JcC3SpA"/>
+    <service id=".service_locator.TAB9RiP" alias=".service_locator._JdKj9p"/>
+    <service id=".service_locator.zLacVVM" alias=".service_locator..W5wjef"/>
     <service id=".service_locator.DXHN2Dk" alias=".service_locator.dTaHD7m"/>
     <service id=".service_locator.Qx1zq01" alias=".service_locator.S9zgqlS"/>
-    <service id=".service_locator.GnJu7wB" alias=".service_locator.5PkTFPo"/>
+    <service id=".service_locator.zRku8vG" alias=".service_locator.GJi4qMg"/>
     <service id=".service_locator.3kmneMY" alias=".service_locator.PTsd.1b"/>
     <service id=".service_locator.Eae8BMR" alias=".service_locator.1fdu00E"/>
     <service id=".service_locator.JpcSPD1" alias=".service_locator.xZ4BuEO"/>

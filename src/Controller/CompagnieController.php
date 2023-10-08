@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Adresse;
 use App\Entity\Compagnie;
+use App\Repository\AdresseRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,7 +39,7 @@ class CompagnieController extends AbstractController
         //* store Company Adresse 
         $adresse = new Adresse();
         $adresse
-            ->setDestinataireType($data->destinataireType)
+            ->setDestinataireType($data->destinataire_type)
             ->setAdresse($data->adresse)
             ->setCodePostal($data->code_postal)
             ->setVille($data->ville)
@@ -53,30 +54,41 @@ class CompagnieController extends AbstractController
         ]);
     }
 
-    #[Route('compagnie', name: 'compagnie.update', methods: ['PUT'])]
-    public function update(Request $request, EntityManagerInterface $em, Compagnie $compagnie): JsonResponse
+    #[Route('compagnie/update/{id}', name: 'compagnie.update', methods: ['PUT', 'PATCH'])]
+    public function update(Request $request, EntityManagerInterface $em, Compagnie $compagnie, AdresseRepository $adresseRepo): JsonResponse
     {
+        $compagnieAdresse = $adresseRepo->findOneBy(["compagnie" => $compagnie->getId()]);
         $data = json_decode($request->getContent());
         $compagnie->setNom($data->nom)
             ->setSecteur($data->secteur)
             ->setSiret($data->siret)
-            ->setType($data->date)
+            ->setType($data->type)
             ->setSite($data->site);
+
+        $compagnieAdresse->setDestinataireType($data->destinataire_type)
+            ->setAdresse($data->adresse)
+            ->setCodePostal($data->code_postal)
+            ->setVille($data->ville)
+            ->setPays($data->pays);
+        $em->persist($compagnieAdresse);
         $em->persist($compagnie);
         $em->flush();
 
         return $this->json([
-            'message' => 'Compagnie added succussfully!'
+            'message' => 'Compagnie Updated succussfully!'
         ]);
     }
 
     #[Route('compagnie/delete/{id}', name: 'compagnie.destroy', methods: ['POST'])]
-    public function delete(EntityManagerInterface $manager, Compagnie $compagnie, UserRepository $userRepository): JsonResponse
+    public function delete(EntityManagerInterface $manager, Compagnie $compagnie, UserRepository $userRepository, AdresseRepository $adresseRepo): JsonResponse
     {
-        $users = $userRepository->findBy(["compagnie" => $compagnie->getId()]) ?? [];
+        $compadresse = $adresseRepo->findOneBy(["compagnie" => $compagnie->getId()]);
+
+        $users = $userRepository->findBy(["compagnie" => $compagnie->getId()]);
         foreach ($users as $user) {
             $manager->remove($user);
         }
+        $manager->remove($compadresse);
         $manager->remove($compagnie);
         $manager->flush();
         return $this->json(['message' => "deleted succussfully"]);
